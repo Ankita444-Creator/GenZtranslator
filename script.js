@@ -10,9 +10,6 @@ const translateBtn = document.getElementById('translateBtn');
 
 let isNormalToGenZ = true;
 
-// এখানে তোর জেমিনি এপিআই কি (Gemini API Key) বসাবি
-const GEMINI_API_KEY = "YOUR_GEMINI_API_KEY_HERE"; 
-
 modeNormalToGenZBtn.addEventListener('click', () => {
     isNormalToGenZ = true;
     modeNormalToGenZBtn.classList.add('active-mode');
@@ -20,7 +17,7 @@ modeNormalToGenZBtn.addEventListener('click', () => {
     langWrapper.style.display = 'flex';
     inputLabel.textContent = "Enter Normal Text:";
     outputLabel.textContent = "Gen-Z Output:";
-    inputText.placeholder = "Type here... e.g., পড়াশোনা, no cap, or English text";
+    inputText.placeholder = "Type here... e.g., পড়াশোনা, no cap";
 });
 
 modeGenZToNormalBtn.addEventListener('click', () => {
@@ -30,10 +27,10 @@ modeGenZToNormalBtn.addEventListener('click', () => {
     langWrapper.style.display = 'none';
     inputLabel.textContent = "Enter Gen-Z Slang Text:";
     outputLabel.textContent = "Decoded Normal Output:";
-    inputText.placeholder = "Type here... e.g., Bro is locked in, let him cook";
+    inputText.placeholder = "Type here... e.g., No cap, let him cook";
 });
 
-translateBtn.addEventListener('click', async () => {
+translateBtn.addEventListener('click', () => {
     const text = inputText.value.trim();
     const lang = targetLangSelect.value;
 
@@ -44,41 +41,52 @@ translateBtn.addEventListener('click', async () => {
 
     outputText.textContent = "Cooking up the vibe... ⚡";
 
-    // জেমিনি এপিআই এর জন্য সঠিক প্রম্পট তৈরি
-    let systemPrompt = "";
-    if (isNormalToGenZ) {
-        systemPrompt = `You are an expert Gen-Z and Brain-Rot slang translator. Translate the given ${lang} text into pure, authentic Gen-Z slang / brain-rot English. Return only the translated text, nothing else.`;
-    } else {
-        systemPrompt = `You are an expert translator. Translate the given Gen-Z slang back accurately into simple, normal English only. Do not include any other languages or extra conversational text. Return only the clear English meaning.`;
-    }
-
-    const fullPrompt = `${systemPrompt}\n\nInput Text: "${text}"`;
-
-    try {
-        // ডাইরেক্ট জেমিনি এপিআই কল (Gemini 1.5 Flash মডেল ব্যবহার করা হচ্ছে)
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                contents: [{
-                    parts: [{ text: fullPrompt }]
-                }]
-            })
-        });
-
-        const data = await response.json();
-        
-        if (data.candidates && data.candidates[0].content.parts[0].text) {
-            let aiOutput = data.candidates[0].content.parts[0].text.trim();
-            outputText.textContent = aiOutput;
-        } else {
-            outputText.textContent = "Couldn't process this vibe right now. Try again! 💀";
-        }
-
-    } catch (error) {
-        console.error("API Error:", error);
-        outputText.textContent = "Network error or invalid API key! Check console. 🛑";
-    }
+    setTimeout(() => {
+        outputText.textContent = handleSmartTranslation(text, lang, isNormalToGenZ);
+    }, 300);
 });
+
+function handleSmartTranslation(text, lang, isNormalToGenZ) {
+    const lowerText = text.toLowerCase();
+
+    if (isNormalToGenZ) {
+        if (lowerText.includes("no cap") || lowerText.includes("mithya na")) {
+            return "No cap fr fr, straight up fax 🧢";
+        }
+        if (lowerText.includes("good") || lowerText.includes("valo")) {
+            return "Absolute W vibe, cooking hard fr 🐐";
+        }
+        if (lowerText.includes("bad") || lowerText.includes("kharap")) {
+            return "Mid af, major L moment 📉💀";
+        }
+        if (lang === "English") {
+            return `"${text}" — real talk, blud is locked in with that main character energy fr fr 💀✨`;
+        }
+        return `"${text}" — absolute brain-rot sigma moment ngl 🗿🔥`;
+    } else {
+        // Gen-Z থেকে Normal (সম্পূর্ণ ইংরেজিতে, কোনো বাংলা নেই)
+        if (lowerText.includes("no cap")) {
+            return "No lie / Telling the truth";
+        }
+        if (lowerText.includes("let him cook")) {
+            return "Allow him to do his thing or show his skills without interruption because he is doing a great job.";
+        }
+        if (lowerText.includes("locked in")) {
+            return "Fully focused and working hard";
+        }
+        if (lowerText.includes("mid")) {
+            return "Average or mediocre, not that good";
+        }
+        if (lowerText.includes("rizz")) {
+            return "Charisma or charm to impress someone";
+        }
+        if (lowerText.includes("sigma")) {
+            return "A cool, independent, and confident person";
+        }
+        if (lowerText.includes("bet")) {
+            return "Agreement or expression of certainty (Sure / Okay)";
+        }
+        
+        return `"${text}" means a modern slang expression or trendy phrase.`;
+    }
+}
