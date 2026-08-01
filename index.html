@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gen-Z Translator</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts for Cool Aesthetic Vibe -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Prominent Top Header -->
+        <header>
+            <h1 class="main-title">Gen-Z Translator</h1>
+            <p class="subtitle">Lock in fr fr. Translate normal text to pure brain-rot or decode it back instantly! 💀</p>
+        </header>
+
+        <div class="card">
+            <!-- Mode Switcher -->
+            <div class="mode-selector">
+                <button id="modeNormalToGenZ" class="active-mode">Normal ➔ Gen-Z</button>
+                <button id="modeGenZToNormal">Gen-Z ➔ Normal</button>
+            </div>
+
+            <!-- Language Selector (Active for Normal mode) -->
+            <div class="lang-selector-wrapper" id="langWrapper">
+                <label for="targetLang">Select Normal Language:</label>
+                <select id="targetLang">
+                    <option value="bn">বাংলা (Bengali)</option>
+                    <option value="hi">हिन्दी (Hindi)</option>
+                    <option value="or">ଓଡ଼ିଆ (Odia)</option>
+                </select>
+            </div>
+
+            <!-- Input Area -->
+            <div class="input-group">
+                <label id="inputLabel" for="inputText">Enter Normal Text:</label>
+                <textarea id="inputText" placeholder="Type here... e.g., পড়াশোনা"></textarea>
+            </div>
+
+            <!-- Translate Button -->
+            <button id="translateBtn">Translate Vibe 🚀</button>
+
+            <!-- Output Area -->
+            <div class="output-group">
+                <label id="outputLabel" for="outputText">Gen-Z Output:</label>
+                <div class="output-box" id="outputText">Your translated vibe will appear here...</div>
+            </div>
+        </div>
+
+        <footer>
+            <p>Built with Vibe Coding ⚡ Hosted on Vercel</p>
+        </footer>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
