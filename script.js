@@ -10,11 +10,8 @@ const translateBtn = document.getElementById('translateBtn');
 
 let isNormalToGenZ = true;
 
-// সিকিউরিটি বাইপাস করার জন্য এপিআই কি-টি টুকরো করে জোড়া লাগানো হলো যাতে GitHub সিক্রেট স্ক্যানিং ধরতে না পারে
-const _k1 = "AQ.Ab8RN6KPma";
-const _k2 = "JxaWoCS9ZNop";
-const _k3 = "4ZV6_aKNlmoce0EvR7aXqyqJlytw";
-const GEMINI_API_KEY = _k1 + _k2 + _k3;
+// এখানে তোর নতুন এপিআই কি টা বসিয়ে দে
+const GEMINI_API_KEY = "YOUR_NEW_API_KEY_HERE"; 
 
 modeNormalToGenZBtn.addEventListener('click', () => {
     isNormalToGenZ = true;
@@ -45,6 +42,11 @@ translateBtn.addEventListener('click', async () => {
         return;
     }
 
+    if (GEMINI_API_KEY === "YOUR_NEW_API_KEY_HERE" || !GEMINI_API_KEY) {
+        outputText.textContent = "Error: Please put your valid Gemini API Key! 🛑";
+        return;
+    }
+
     outputText.textContent = "Cooking up the vibe... ⚡";
 
     let systemPrompt = "";
@@ -57,8 +59,7 @@ translateBtn.addEventListener('click', async () => {
     const fullPrompt = `${systemPrompt}\n\nInput Text: "${text}"`;
 
     try {
-        const response = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
-        const apiResponse = await fetch(response, {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -70,7 +71,7 @@ translateBtn.addEventListener('click', async () => {
             })
         });
 
-        const data = await apiResponse.json();
+        const data = await response.json();
         
         if (data.candidates && data.candidates[0].content.parts[0].text) {
             let aiOutput = data.candidates[0].content.parts[0].text.trim();
