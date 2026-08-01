@@ -10,9 +10,6 @@ const translateBtn = document.getElementById('translateBtn');
 
 let isNormalToGenZ = true;
 
-// এখানে তোর নতুন এপিআই কি টা বসিয়ে দে
-const GEMINI_API_KEY = "YOUR_NEW_API_KEY_HERE"; 
-
 modeNormalToGenZBtn.addEventListener('click', () => {
     isNormalToGenZ = true;
     modeNormalToGenZBtn.classList.add('active-mode');
@@ -42,11 +39,6 @@ translateBtn.addEventListener('click', async () => {
         return;
     }
 
-    if (GEMINI_API_KEY === "YOUR_NEW_API_KEY_HERE" || !GEMINI_API_KEY) {
-        outputText.textContent = "Error: Please put your valid Gemini API Key! 🛑";
-        return;
-    }
-
     outputText.textContent = "Cooking up the vibe... ⚡";
 
     let systemPrompt = "";
@@ -59,23 +51,19 @@ translateBtn.addEventListener('click', async () => {
     const fullPrompt = `${systemPrompt}\n\nInput Text: "${text}"`;
 
     try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+        // ব্যাকএন্ড বা সার্ভারলেস ফাংশনের মাধ্যমে কল করা সবচেয়ে নিরাপদ
+        const response = await fetch('/api/translate', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                contents: [{
-                    parts: [{ text: fullPrompt }]
-                }]
-            })
+            body: JSON.stringify({ prompt: fullPrompt })
         });
 
         const data = await response.json();
         
-        if (data.candidates && data.candidates[0].content.parts[0].text) {
-            let aiOutput = data.candidates[0].content.parts[0].text.trim();
-            outputText.textContent = aiOutput;
+        if (data.output) {
+            outputText.textContent = data.output.trim();
         } else {
             outputText.textContent = "Couldn't process this vibe right now. Try again! 💀";
         }
