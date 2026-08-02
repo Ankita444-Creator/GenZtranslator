@@ -30,7 +30,7 @@ modeGenZToNormalBtn.addEventListener('click', () => {
     inputText.placeholder = "Type here... e.g., No cap, let him cook";
 });
 
-translateBtn.addEventListener('click', () => {
+translateBtn.addEventListener('click', async () => {
     const text = inputText.value.trim();
     const lang = targetLangSelect.value;
 
@@ -39,64 +39,58 @@ translateBtn.addEventListener('click', () => {
         return;
     }
 
-    outputText.textContent = "Cooking up the vibe... ⚡";
-
-    setTimeout(() => {
-        outputText.textContent = handleSmartTranslation(text, lang, isNormalToGenZ);
-    }, 300);
-});
-
-function handleSmartTranslation(text, lang, isNormalToGenZ) {
-    const lowerText = text.toLowerCase();
-
-    if (isNormalToGenZ) {
-        // নরমাল থেকে Gen-Z
-        if (lowerText.includes("no cap") || lowerText.includes("mithya na") || lowerText.includes("sotti")) {
-            return "No cap fr fr, straight up fax 🧢🔥";
+    // ব্রাউজারে এপিআই কি সেভ আছে কিনা চেক করা, না থাকলে ইউজারের কাছে চাওয়া
+    let apiKey = localStorage.getItem('gemini_api_key');
+    if (!apiKey) {
+        apiKey = prompt("Enter your Gemini API Key (It will be saved safely in your browser):");
+        if (!apiKey) {
+            outputText.textContent = "Error: API Key is required to run AI translation! 🛑";
+            return;
         }
-        if (lowerText.includes("good") || lowerText.includes("valo") || lowerText.includes("awesome")) {
-            return "Absolute W vibe, cooking hard, main character energy 🐐✨";
-        }
-        if (lowerText.includes("bad") || lowerText.includes("kharap")) {
-            return "Mid af, major L moment, total brain-rot 📉💀";
-        }
-        if (lowerText.includes("study") || lowerText.includes("porashona")) {
-            return "Locked in grinding hard for the exam arc fr fr 📚🗿";
-        }
-        return `"${text}" — real talk, blud is totally locked in with that sigma energy ngl 💀🔥`;
-    } else {
-        // Gen-Z থেকে Normal (সঠিক ডিকোড করা মানে)
-        if (lowerText.includes("no cap")) {
-            return "No lie / Telling the absolute truth.";
-        }
-        if (lowerText.includes("let him cook")) {
-            return "Allow him to do his thing or show his skills without interruption because he is doing a great job.";
-        }
-        if (lowerText.includes("locked in")) {
-            return "Fully focused, dedicated, and working hard towards a goal.";
-        }
-        if (lowerText.includes("mid")) {
-            return "Average or mediocre quality, not impressive at all.";
-        }
-        if (lowerText.includes("rizz")) {
-            return "Natural charisma or charm used to impress someone.";
-        }
-        if (lowerText.includes("sigma")) {
-            return "A cool, independent, self-reliant, and confident person.";
-        }
-        if (lowerText.includes("bet")) {
-            return "An expression of agreement, certainty, or confirmation (Sure / Okay / Deal).";
-        }
-        if (lowerText.includes("gatekeeping")) {
-            return "Withholding information, tips, or trends from others to keep it exclusive.";
-        }
-        if (lowerText.includes("touching grass")) {
-            return "Going outside into the real world away from the internet or screens.";
-        }
-        if (lowerText.includes("npc energy")) {
-            return "Acting like a background video game character with no original thoughts or personality.";
-        }
-        
-        return `"${text}" means a modern internet slang expression used to describe a trendy vibe or attitude.`;
+        localStorage.setItem('gemini_api_key', apiKey.trim());
     }
-}
+
+    outputText.textContent = "Cooking up the vibe with AI... ⚡";
+
+    let systemPrompt = "";
+    if (isNormalToGenZ) {
+        systemPrompt = `You are an expert Gen-Z slang translator. Translate the given text into pure, authentic Gen-Z slang / brain-rot English or match the target language style if requested. Return only the translated text, nothing else.`;
+    } else {
+        systemPrompt = `You are an expert translator. Translate the given Gen-Z slang text, phrase, or long sentence accurately into simple, normal English or clear natural language. Explain what it means clearly. Return only the clean explanation.`;
+    }
+
+    const fullPrompt = `${systemPrompt}\n\nTarget Language: ${lang}\nInput Text: "${text}"`;
+
+    try {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{ text: fullPrompt }]
+                }]
+            })
+        });
+
+        const data = await response.json();
+        
+        if (data.candidates && data.candidates[0].content.parts[0].text) {
+            let aiOutput = data.candidates[0].content.parts[0].text.trim();
+            outputText.textContent = aiOutput;
+        } else {
+            // যদি কি ভুল হয় বা এক্সপায়ার হয়ে যায়, তখন লোকাল স্টোরেজ ক্লিয়ার করে দেবো
+            if(data.error) {
+                localStorage.removeItem('gemini_api_key');
+                outputText.textContent = "Invalid API Key! Please try translating again to enter a valid key. 🛑";
+            } else {
+                outputText.textContent = "Couldn't process this vibe right now. Try again! 💀";
+            }
+        }
+
+    } catch (error) {
+        console.error("API Error:", error);
+        outputText.textContent = "Network error! Check your internet connection. 🛑";
+    }
+});
