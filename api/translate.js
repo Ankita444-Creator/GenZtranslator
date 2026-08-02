@@ -20,9 +20,9 @@ export default async function handler(req, res) {
     const fullPrompt = `${systemPrompt}\n\nTarget Language: ${lang}\nInput Text: "${text}"`;
 
     try {
-        const response = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
         
-        const apiResponse = await fetch(response, {
+        const apiResponse = await fetch(apiUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -36,7 +36,7 @@ export default async function handler(req, res) {
             return res.status(200).json({ result: data.candidates[0].content.parts[0].text.trim() });
         } else {
             console.error("Gemini API Error Response:", JSON.stringify(data));
-            return res.status(500).json({ error: data.error?.message || 'AI generation failed due to invalid response structure' });
+            return res.status(500).json({ error: data.error?.message || 'AI generation failed' });
         }
     } catch (error) {
         console.error("Fetch Catch Error:", error);
