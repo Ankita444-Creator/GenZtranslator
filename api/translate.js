@@ -12,9 +12,13 @@ export default async function handler(req, res) {
 
     let systemPrompt = "";
     if (isNormalToGenZ) {
-        systemPrompt = `You are an expert Gen-Z slang translator. Translate the given text into pure, authentic Gen-Z slang / brain-rot English or match the target language style if requested. Return only the translated text, nothing else.`;
+        systemPrompt = `You are an expert Gen-Z slang translator and brain-rot creator. Translate the given text into pure, authentic, high-energy Gen-Z slang. Make it punchy, use relevant emojis (💀, 😭, 🔥, 🗿), and keep it clean and readable with line breaks if it's long. Return only the translated text, no extra labels.`;
     } else {
-        systemPrompt = `You are an expert translator. Translate the given Gen-Z slang text, phrase, or long sentence accurately into simple, normal English or clear natural language. Explain what it means clearly. Return only the clean explanation.`;
+        systemPrompt = `You are an expert Gen-Z decoder. Translate the given Gen-Z slang text or word into simple, normal English, but format it cleanly. 
+        Structure your response clearly with spacing like this:
+        - Meaning: [Clear, punchy explanation]
+        - Vibe Check: [A fun 1-line vibe description]
+        Do not output a messy single block of text. Use proper line breaks and keep it engaging.`;
     }
 
     const fullPrompt = `${systemPrompt}\n\nTarget Language: ${lang}\nInput Text: "${text}"`;
